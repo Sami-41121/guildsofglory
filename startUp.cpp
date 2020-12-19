@@ -203,10 +203,10 @@ void startUp::setMousePosition()
 	/**
 	* @return void
 	* 
-	* -sets current mouse position to local variables
+	* -sets current mouse position w.r.t. window
 	* -updates mouse position in each loop
 	*/
-	this->mousePosition = sf::Mouse::getPosition();
+	this->mousePosition = sf::Mouse::getPosition(*window);
 }
 
 void startUp::renderButtonText()
