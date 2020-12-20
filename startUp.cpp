@@ -28,8 +28,10 @@ void startUp::initWindow()
 	* 
 	* -initializes window
 	* -set window size
+	* -set frame rate
 	*/
 	window = new sf::RenderWindow(sf::VideoMode(900.0f, 600.0f), "Guilds of Glory", sf::Style::Close | sf::Style::Titlebar);
+	window->setFramerateLimit(60);
 }
 
 void startUp::initText()
