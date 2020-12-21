@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include<iostream>
-#include<vector>
+#include <iostream>
+#include <vector>
+#include "Leaderboard.h"
 
 /**
 * Class that creates the starting menu
@@ -54,5 +55,8 @@ public:
 	void renderButtons();
 	void renderButtonText();
 	void render();
+
+	//Switching to new window
+	void openLeaderboard();
 	
 };
