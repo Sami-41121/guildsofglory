@@ -28,7 +28,7 @@ void startUp::initWindow()
 	* 
 	* -initializes window
 	* -set window size
-	* -set frame rate
+	* -set window frame rate
 	*/
 	window = new sf::RenderWindow(sf::VideoMode(900.0f, 600.0f), "Guilds of Glory", sf::Style::Close | sf::Style::Titlebar);
 	window->setFramerateLimit(60);
@@ -66,9 +66,8 @@ void startUp::initFont()
 
 startUp::startUp() {
 	/**
-	* This function is the container of the main loop
-	* Return type void
-	* Takes window as parameter and updates ans renders the window
+	* Constructor for startUp class
+	* calls the init functions
 	*/
 
 	this->initVariables();
@@ -102,6 +101,10 @@ void startUp::pollEvents()
 	* 
 	* -contains event loop
 	* -takes care of each event
+	* -open intermediate window
+	* -open rules window
+	* -open leaderboard window
+	* -exits the game
 	*/
 	while (this->window->pollEvent(this->evnt)) {
 		switch (this->evnt.type) {
@@ -119,7 +122,7 @@ void startUp::pollEvents()
 					std::cout << "Clicked Button 1\n";
 					break;
 				case 2:
-					std::cout << "Clicked Button 2\n";
+					this->openLeaderboard();
 					break;
 				case 3:
 					this->window->close();
@@ -145,8 +148,6 @@ void startUp::update()
 	this->setButtonPos();
 	this->setMousePosition();
 	this->pollEvents();	
-
-	/*   Take input for options   */
 	
 }
 
@@ -205,7 +206,7 @@ void startUp::setMousePosition()
 	/**
 	* @return void
 	* 
-	* -sets current mouse position w.r.t. window
+	* -sets current mouse position to local variables
 	* -updates mouse position in each loop
 	*/
 	this->mousePosition = sf::Mouse::getPosition(*window);
@@ -224,7 +225,7 @@ void startUp::renderButtonText()
 
 	for (int i = 0; i < 4; i++) {
 		buttonText.setString(this->options[i]);
-		buttonText.setOrigin(sf::Vector2f(this->options[i].size() * 12.5f, 0.0f));
+		buttonText.setOrigin(sf::Vector2f(this->options[i].size() * 9.f, 0.0f));
 		buttonText.setPosition(this->buttonPos[i]);
 		this->window->draw(this->buttonText);
 	}
@@ -246,4 +247,30 @@ int startUp::findClickedButton()
 		}
 	}
 	return -1;
+}
+
+void startUp::openLeaderboard()
+{
+	/**
+	* @return void
+	* 
+	* -open new leaderboard window
+	* -set current window visibility to false
+	* -contain game loop for leaderboard
+	* -set current window visibility to true when done
+	*/
+
+	Leaderboard leaderboard(this->font);
+	this->window->setVisible(false);
+
+	while (leaderboard.isRunning()) {
+		// Update
+		leaderboard.update();
+
+		//Render
+		leaderboard.render();
+	}
+
+	this->window->setVisible(true);
+
 }
