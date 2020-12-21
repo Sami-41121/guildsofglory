@@ -1,0 +1,2 @@
+Sl no.    Player    Score     Rank      Time
+1         Sami      12        3         20:00
