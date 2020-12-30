@@ -8,7 +8,7 @@ void startUp::initVariables()
 {
 	/**
 	* @return void
-	* 
+	*
 	* -intitializes the private variables
 	* -sets the strings for buttons
 	*/
@@ -25,7 +25,7 @@ void startUp::initWindow()
 {
 	/**
 	* @return void
-	* 
+	*
 	* -initializes window
 	* -set window size
 	* -set window frame rate
@@ -38,7 +38,7 @@ void startUp::initText()
 {
 	/**
 	* @return void
-	* 
+	*
 	* -sets text for buttons
 	* -sets char size and color
 	*/
@@ -54,12 +54,12 @@ void startUp::initFont()
 {
 	/**
 	* @return void
-	* 
+	*
 	* -loads font from file
 	* -shows error message if failed
 	*/
 
-	if (!this->font.loadFromFile("aAbsoluteEmpire.ttf")) {
+	if (!this->font.loadFromFile("aAbsoluteEmpire")) {
         std::cout << "Error Loading Font.";
 	}
 }
@@ -74,7 +74,7 @@ startUp::startUp() {
 	this->initWindow();
 	this->initFont();
 	this->initText();
-	
+
 }
 
 startUp::~startUp() {
@@ -87,7 +87,7 @@ startUp::~startUp() {
 const bool startUp::isRunning() const
 {
 	/**
-	* @return bool 
+	* @return bool
 	* -true if window is open
 	* -false if window closed
 	*/
@@ -98,7 +98,7 @@ void startUp::pollEvents()
 {
 	/**
 	* @return void
-	* 
+	*
 	* -contains event loop
 	* -takes care of each event
 	* -open intermediate window
@@ -116,6 +116,7 @@ void startUp::pollEvents()
 				int clickedButton = this->findClickedButton();
 				switch (clickedButton) {
 				case 0:
+				    this->openIntermediate();
 					std::cout << "Clicked Button 0\n";
 					break;
 				case 1:
@@ -147,8 +148,8 @@ void startUp::update()
 	*/
 	this->setButtonPos();
 	this->setMousePosition();
-	this->pollEvents();	
-	
+	this->pollEvents();
+
 }
 
 void startUp::setButtonPos()
@@ -167,13 +168,13 @@ void startUp::render()
 {
 	/**
 	* @return void
-	* 
+	*
 	* -Clear old frame
 	* -Render Objects
 	* -Display frame in window
 	*/
 	this->window->clear(sf::Color(0, 0, 0, 255));
-	
+
 	this->renderButtons();
 	this->renderButtonText();
 	this->window->display();
@@ -184,7 +185,7 @@ void startUp::renderButtons()
 {
 	/**
 	* @return void
-	* 
+	*
 	* -render buttons
 	* -set outline and color
 	* -draw the buttons
@@ -205,7 +206,7 @@ void startUp::setMousePosition()
 {
 	/**
 	* @return void
-	* 
+	*
 	* -sets current mouse position to local variables
 	* -updates mouse position in each loop
 	*/
@@ -216,7 +217,7 @@ void startUp::renderButtonText()
 {
 	/**
 	* @return void
-	* 
+	*
 	* -Renders button text
 	* -Modifies the string of each button
 	* -Modifies origin according to string size
@@ -235,7 +236,7 @@ int startUp::findClickedButton()
 {
 	/**
 	* @return type int
-	* 
+	*
 	* -check for valid mouse click
 	* -return the index of button clicked
 	* -return -1 if mouse input is not valid
@@ -253,7 +254,7 @@ void startUp::openLeaderboard()
 {
 	/**
 	* @return void
-	* 
+	*
 	* -open new leaderboard window
 	* -set current window visibility to false
 	* -contain game loop for leaderboard
@@ -272,5 +273,30 @@ void startUp::openLeaderboard()
 	}
 
 	this->window->setVisible(true);
+
+}
+void startUp::openIntermediate()
+{
+	/**
+	* @return void
+	*
+	* -open new leaderboard window
+	* -set current window visibility to false
+	* -contain game loop for leaderboard
+	* -set current window visibility to true when done
+	*/
+
+	Intermediate intermediate(this->font);
+	this->window->setVisible(false);
+
+	while (intermediate.isRunning()) {
+		// Update
+		intermediate.update();
+
+		//Render
+		intermediate.render();
+	}
+    this->window->setVisible(true);
+	//this->window->close();
 
 }
