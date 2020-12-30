@@ -21,18 +21,18 @@ private:
 
 	//Variables
 	std::vector<sf::Vector2f> buttonPos;
-	std::vector<std::string> options;
+	std::vector<sf::Texture> buttonTexture;
 	sf::Event evnt;
 	sf::Text buttonText;
+	sf::Texture background;
 	sf::Font font;
-
 	sf::Vector2i mousePosition;
 	
 	
 	//private functions
 	void initVariables();
-	void initFont();
-	void initText();
+	void initFonts();
+	void initTexture();
 	void initWindow();
 
 public:
@@ -53,7 +53,7 @@ public:
 
 	//Render / Draw
 	void renderButtons();
-	void renderButtonText();
+	void renderBackground();
 	void render();
 
 	//Switching to new window
