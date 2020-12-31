@@ -11,7 +11,7 @@ int main()
         startup.update();
 
         //Render
-        startup.render(); 
+        startup.render();
     }
     return 0;
 }

@@ -10,15 +10,11 @@ void startUp::initVariables()
 	* @return void
 	*
 	* -intitializes the private variables
-	* -sets the strings for buttons
 	*/
 	this->window = nullptr;
 	buttonPos = std::vector<sf::Vector2f>(4);
-	options = std::vector<std::string>(4);
-	options[0] = "Start Game";
-	options[1] = "Game Story and Rules";
-	options[2] = "Leaderboard";
-	options[3] = "Quit Game";
+	buttonTexture = std::vector<sf::Texture>(4);
+
 }
 
 void startUp::initWindow()
@@ -30,27 +26,38 @@ void startUp::initWindow()
 	* -set window size
 	* -set window frame rate
 	*/
-	window = new sf::RenderWindow(sf::VideoMode(900.0f, 600.0f), "Guilds of Glory", sf::Style::Close | sf::Style::Titlebar);
+	window = new sf::RenderWindow(sf::VideoMode(1280.0f, 720.0f), "Guilds of Glory", sf::Style::Fullscreen);
 	window->setFramerateLimit(60);
 }
 
-void startUp::initText()
+void startUp::initTexture()
 {
 	/**
 	* @return void
 	*
-	* -sets text for buttons
-	* -sets char size and color
+	* load texture from file
+	* show error message if failed
+	* setTexture to buttonTexture
 	*/
-
-	this->buttonText.setFont(this->font);
-	this->buttonText.setCharacterSize(25);
-	this->buttonText.setFillColor(sf::Color::White);
-	this->buttonText.setString("NONE");
+	if (!this->background.loadFromFile("Resources/startup_bg.jpg")) {
+		std::cout << "Error loading bgTexture";
+	}
+	if (!this->buttonTexture[0].loadFromFile("Resources/button_start-game.png")) {
+		std::cout << "Error loading bgTexture";
+	}
+	if (!this->buttonTexture[1].loadFromFile("Resources/button_game-story-and-rules.png")) {
+		std::cout << "Error loading bgTexture";
+	}
+	if (!this->buttonTexture[2].loadFromFile("Resources/button_leaderboard.png")) {
+		std::cout << "Error loading bgTexture";
+	}
+	if (!this->buttonTexture[3].loadFromFile("Resources/button_exit-game.png")) {
+		std::cout << "Error loading bgTexture";
+	}
 
 }
 
-void startUp::initFont()
+void startUp::initFonts()
 {
 	/**
 	* @return void
@@ -59,7 +66,7 @@ void startUp::initFont()
 	* -shows error message if failed
 	*/
 
-	if (!this->font.loadFromFile("aAbsoluteEmpire")) {
+	if (!this->font.loadFromFile("Resources/pointfree.ttf")) {
         std::cout << "Error Loading Font.";
 	}
 }
@@ -72,9 +79,8 @@ startUp::startUp() {
 
 	this->initVariables();
 	this->initWindow();
-	this->initFont();
-	this->initText();
-
+	this->initFonts();
+	this->initTexture();
 }
 
 startUp::~startUp() {
@@ -128,8 +134,7 @@ void startUp::pollEvents()
 				case 3:
 					this->window->close();
 					break;
-				default:
-					break;
+
 				}
 			}
 			break;
@@ -160,7 +165,7 @@ void startUp::setButtonPos()
 	*/
 	for (int i = 0; i < 4; i++) {
 		this->buttonPos[i].x = window->getSize().x / 2;
-		this->buttonPos[i].y = window->getSize().y * (0.2 + i * (0.6 / 4));
+		this->buttonPos[i].y = window->getSize().y * (0.3 + i * (0.6 / 4));
 	}
 }
 
@@ -174,9 +179,8 @@ void startUp::render()
 	* -Display frame in window
 	*/
 	this->window->clear(sf::Color(0, 0, 0, 255));
-
+	this->renderBackground();
 	this->renderButtons();
-	this->renderButtonText();
 	this->window->display();
 
 }
@@ -191,14 +195,12 @@ void startUp::renderButtons()
 	* -draw the buttons
 	* -
 	*/
-	sf::RectangleShape button(sf::Vector2f(500.f, 60.0f));
-	button.setOrigin(250.f, 0.0f);
-	button.setFillColor(sf::Color::Red);
-	button.setOutlineColor(sf::Color(255, 255, 255, 255));
-	button.setOutlineThickness(10.0f);
-	for (auto v : buttonPos) {
-		button.setPosition(v);
-		window->draw(button);
+	sf::RectangleShape button(sf::Vector2f(400.f, 60.0f));
+	button.setOrigin(200.f, 0.0f);
+	for (int i = 0; i < 4; i++) {
+		button.setTexture(&buttonTexture[i]);
+		button.setPosition(buttonPos[i]);
+		this->window->draw(button);
 	}
 }
 
@@ -211,25 +213,6 @@ void startUp::setMousePosition()
 	* -updates mouse position in each loop
 	*/
 	this->mousePosition = sf::Mouse::getPosition(*window);
-}
-
-void startUp::renderButtonText()
-{
-	/**
-	* @return void
-	*
-	* -Renders button text
-	* -Modifies the string of each button
-	* -Modifies origin according to string size
-	* -Draw button text
-	*/
-
-	for (int i = 0; i < 4; i++) {
-		buttonText.setString(this->options[i]);
-		buttonText.setOrigin(sf::Vector2f(this->options[i].size() * 9.f, 0.0f));
-		buttonText.setPosition(this->buttonPos[i]);
-		this->window->draw(this->buttonText);
-	}
 }
 
 int startUp::findClickedButton()
@@ -250,6 +233,18 @@ int startUp::findClickedButton()
 	return -1;
 }
 
+void startUp::renderBackground()
+{
+	/**
+	* @return void
+	*
+	* draws the background texture
+	*/
+	sf::RectangleShape bg(sf::Vector2f(1280.f, 720.f));
+	bg.setTexture(&background);
+	this->window->draw(bg);
+}
+
 void startUp::openLeaderboard()
 {
 	/**
@@ -261,8 +256,8 @@ void startUp::openLeaderboard()
 	* -set current window visibility to true when done
 	*/
 
-	Leaderboard leaderboard(this->font);
-	this->window->setVisible(false);
+	Leaderboard leaderboard(this->window, this->font);
+
 
 	while (leaderboard.isRunning()) {
 		// Update
@@ -272,31 +267,20 @@ void startUp::openLeaderboard()
 		leaderboard.render();
 	}
 
-	this->window->setVisible(true);
-
 }
 void startUp::openIntermediate()
 {
-	/**
-	* @return void
-	*
-	* -open new leaderboard window
-	* -set current window visibility to false
-	* -contain game loop for leaderboard
-	* -set current window visibility to true when done
-	*/
 
-	Intermediate intermediate(this->font);
-	this->window->setVisible(false);
+	Intermediate intermediate(this->window,this->font);
+
 
 	while (intermediate.isRunning()) {
-		// Update
+
 		intermediate.update();
 
-		//Render
+
 		intermediate.render();
 	}
-    this->window->setVisible(true);
-	//this->window->close();
 
 }
+

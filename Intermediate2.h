@@ -2,43 +2,47 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
-#include "Leaderboard.h"
-#include "Intermediate.h"
-/**
-* Class that creates the starting menu
-* Start menu will have the following options:
-* -Start Game
-* -Game story and Rules
-* -Leaderboard
-* -Exit Game
-*/
+#include <fstream>
+#include <sstream>
 
-class startUp
+/**
+* This class will create a window to display leaderboard
+* Options: (Difficulty)
+* -Easy
+* -Medium
+* -Hard
+*
+* Stored info:
+* -Player
+* -Score
+* -Rank
+* -Time
+*/
+class
 {
 private:
-	// Window
+	//window
 	sf::RenderWindow* window;
 
-	//Variables
+	//variables
 	std::vector<sf::Vector2f> buttonPos;
-	std::vector<sf::Texture> buttonTexture;
+	std::vector<std::string> options;
 	sf::Event evnt;
-	sf::Text buttonText;
-	sf::Texture background;
+	sf::Text buttonText, titleText, fileText;
 	sf::Font font;
+
 	sf::Vector2i mousePosition;
 
 
 	//private functions
 	void initVariables();
-	void initFonts();
-	void initTexture();
+	void initFont(sf::Font font);
+	void initText();
 	void initWindow();
 
 public:
-
-	startUp();
-	virtual ~startUp();
+	Leaderboard(sf::Font font);
+	virtual ~Leaderboard();
 
 	// Accessors
 	const bool isRunning() const;
@@ -52,12 +56,9 @@ public:
 	void update();
 
 	//Render / Draw
+	void renderTitle();
 	void renderButtons();
-	void renderBackground();
+	void renderButtonText();
 	void render();
-
-	//Switching to new window
-	void openLeaderboard();
-	void openIntermediate();
 
 };

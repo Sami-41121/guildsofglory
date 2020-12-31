@@ -11,7 +11,7 @@
 * -Easy
 * -Medium
 * -Hard
-* 
+*
 * Stored info:
 * -Player
 * -Score
@@ -23,13 +23,15 @@ class Leaderboard
 private:
 	//window
 	sf::RenderWindow* window;
-	
+
 	//variables
+	bool lbOpen;
 	std::vector<sf::Vector2f> buttonPos;
-	std::vector<std::string> options;
+	std::vector<sf::Texture> buttonTexture;
 	sf::Event evnt;
-	sf::Text buttonText, titleText, fileText;
+	sf::Text fileText;
 	sf::Font font;
+	sf::Texture background;
 
 	sf::Vector2i mousePosition;
 
@@ -38,10 +40,11 @@ private:
 	void initVariables();
 	void initFont(sf::Font font);
 	void initText();
-	void initWindow();
+	void initWindow(sf::RenderWindow *window);
+	void initTexture();
 
 public:
-	Leaderboard(sf::Font font);
+	Leaderboard(sf::RenderWindow *window, sf::Font font);
 	virtual ~Leaderboard();
 
 	// Accessors
@@ -56,9 +59,8 @@ public:
 	void update();
 
 	//Render / Draw
-	void renderTitle();
 	void renderButtons();
-	void renderButtonText();
+	void renderBackground();
 	void render();
 
 	//Open Leaderboard Files
