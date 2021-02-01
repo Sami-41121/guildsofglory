@@ -1,0 +1,6 @@
+The Game consists of several rounds. 
+In each round, cards will be redistributed and the players will Bid.
+In the bidding window, you can see the cards in your hand and place your bid.
+Press Up or Down key to increase or decrease bid.
+You cannon place bid less than 2 or more than 6.
+Click the card to play it. You have to follow suite
