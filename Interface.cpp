@@ -55,6 +55,9 @@ void Interface::initFonts()
 	if (!this->font3.loadFromFile("Resources/pointfree.ttf")) {
 		std::cout << "Error Loading Font";
 	}
+	if (!this->menuFont.loadFromFile("Resources/Dragon_Fire.ttf")) {
+		std::cout << "Error Loading Font";
+	}
 }
 
 void Interface::initText()
@@ -98,6 +101,9 @@ void Interface::initTexture()
 		std::cout << "Error loading bgTexture";
 	}
 	if (!this->barTexture.loadFromFile("Resources/bar.jpg")) {
+		std::cout << "Error loading bgTexture";
+	}
+	if (!this->crystalTexture.loadFromFile("Resources/crystal.png")) {
 		std::cout << "Error loading bgTexture";
 	}
 	this->rightBar.setTexture(&barTexture);
@@ -319,8 +325,8 @@ void Interface::drawCards()
 	nameText.setString(name);
 	this->window->draw(nameText);
 	this->card.setRotation(0.0f);
-	numCards = (*players)[0].getHandSize();
-	if (numCards > 0) {
+
+	if ((*players)[0].getHandSize()) {
 		for (int i = 0; i < cardPos.size(); i++) {
 			std::pair<int, int> c = (*(*players)[0].getHand())[i];
 			card.setTexture(&cardTextures[c.first * 10 + c.second]);
@@ -362,23 +368,25 @@ void Interface::openPauseMenu()
 	this->isPaused = true;
 
 	std::vector<sf::Vector2f> buttonPos(2);
-	std::vector<sf::Texture> buttonTexture(2);
+	sf::Texture buttonTexture;
 	sf::Texture newBg;
+	sf::Text buttonText;
+	
+	char buttonString[2][20] = { "Resume", "Exit to Main Menu" };
 	sf::RectangleShape button(sf::Vector2f(400.f, 60.f));
+	sf::RectangleShape newBackground(sf::Vector2f(1280.f, 720.f));
 	button.setOrigin(200.f, 0.f);
 	sf::Event ev;
 
-	if (!newBg.loadFromFile("Resources/startup_bg.jpg")) {
+	if (!newBg.loadFromFile("Resources/bg_raw.jpg")) {
 		std::cout << "Error loading bgTexture";
 	}
-	if (!buttonTexture[0].loadFromFile("Resources/button_resume.png")) {
+	if (!buttonTexture.loadFromFile("Resources/button.png")) {
 		std::cout << "Error loading bgTexture";
 	}
-	if (!buttonTexture[1].loadFromFile("Resources/button_exit-to-main-menu.png")) {
-		std::cout << "Error loading bgTexture";
-	}
+	
+	newBackground.setTexture(&newBg);
 
-	this->background.setTexture(&newBg);
 	while (isPaused) {
 
 		this->setMousePosition();
@@ -406,18 +414,40 @@ void Interface::openPauseMenu()
 		}
 
 		this->window->clear();
-		this->window->draw(background);
+		this->window->draw(newBackground);
+
+		buttonText.setFont(menuFont);
+		buttonText.setString("Paused");
+		buttonText.setCharacterSize(70);
+		buttonText.setFillColor(sf::Color(105, 105, 105));
+
+		sf::FloatRect textRect = buttonText.getLocalBounds();
+		buttonText.setOrigin(textRect.left + textRect.width / 2.0f, 0);
+		buttonText.setPosition(window->getSize().x / 2, window->getSize().y * 0.2);
+		
+		this->window->draw(buttonText);
+		buttonText.setFont(font2);
+
 		for (int i = 0; i < 2; i++) {
 			buttonPos[i].x = window->getSize().x / 2;
-			buttonPos[i].y = window->getSize().y * (0.3 + i * (0.15));
-			button.setTexture(&buttonTexture[i]);
+			buttonPos[i].y = window->getSize().y * (0.4 + i * (0.15));
+			button.setTexture(&buttonTexture);
 			button.setPosition(buttonPos[i]);
+			buttonText.setString(buttonString[i]);
+			buttonText.setCharacterSize(30);
+
+			sf::FloatRect textRect = buttonText.getLocalBounds();
+			buttonText.setOrigin(textRect.left + textRect.width / 2.0f, 0);
+
+			buttonText.setPosition(buttonPos[i].x, buttonPos[i].y + 15.f);
+			buttonText.setFillColor(sf::Color(250, 250, 210));
 			this->window->draw(button);
+			this->window->draw(buttonText);
 		}
 		this->window->display();
 
 	}
-	this->background.setTexture(&bgTexture);
+	
 }
 
 bool cardComp1(std::pair<int, int>& a, std::pair<int, int>& b)
@@ -485,10 +515,10 @@ const bool Interface::isRunning() const
 	return this->isOpen;
 }
 
-bool Interface::isIdle()
-{
-	return this->idle;
-}
+//bool Interface::isIdle()
+//{
+//	return this->idle;
+//}
 
 void Interface::drawInterface(std::vector<std::pair<int, int>>& fighters)
 {
@@ -534,9 +564,9 @@ void Interface::pollEvents()
 			if (evnt.key.code == sf::Keyboard::Escape) {
 				this->openPauseMenu();
 			}
-			else if (evnt.key.code == sf::Keyboard::Space) {
+			/*else if (evnt.key.code == sf::Keyboard::Space) {
 				this->idle = false;
-			}
+			}*/
 			break;
 		}
 	}
@@ -550,13 +580,14 @@ void Interface::setRoundInfo(int roundNum)
 	* -set values for roundNum and rounfBuff
 	*/
 	this->roundNum = roundNum;
+	srand(time(NULL));
 	this->roundBuff = rand() % 4;
 }
 
-void Interface::setIdle()
-{
-	this->idle = true;
-}
+//void Interface::setIdle()
+//{
+//	this->idle = true;
+//}
 
 void Interface::resetPoints()
 {
@@ -578,15 +609,14 @@ void Interface::distributeCards(std::vector<std::pair<int, int>> cards)
 	* -check for fair distribution
 	* -recurse for false
 	*/
-	mSuite = rBuff = this->roundBuff;
+	rBuff = this->roundBuff;
 	std::vector<std::pair<int, int>> done;
-	srand(NULL);
-	for (int i = 0; i < (*players).size(); i++) {
+	for (int i = 0; i < 4; i++) {
 		(*players)[i].clearHand();
 	}
 
 	while (cards.size()) {
-		for (int i = 0; i < (*players).size(); i++) {
+		for (int i = 0; i < 4; i++) {
 			int x = rand() % cards.size();
 			(*players)[i].getCard(cards[x]);
 			done.push_back(*(cards.begin() + x));
@@ -603,9 +633,6 @@ void Interface::distributeCards(std::vector<std::pair<int, int>> cards)
 		for (int j = 0; j < 4; j++) {
 			if (cnt[j] == 0) fairDistribution = false;
 		}
-		//sort((*(*players)[i].getHand()).begin(), (*(*players)[i].getHand()).end(), cardComp);
-		std::cout << this->roundBuff << "\n";
-		std::vector<std::pair<int, int>>* vp = (*players)[i].getHand();
 		
 		bubbleSort((*players)[i].getHand(), false);
 		
@@ -641,7 +668,6 @@ int Interface::chooseFirstPlayer()
 	* -select random player
 	* -return the index
 	*/
-	srand(NULL);
 	int p1 = rand() % 4;
 	return p1;
 }
@@ -659,7 +685,6 @@ int Interface::compareCards(std::vector<std::pair<int, int>>& fighters)
 	for (int i = 0; i < 4; i++) {
 		mp[fighters[i]] = i;
 	}
-	//sort(fighters.begin(), fighters.end(), cardComp);
 	bubbleSort(&fighters, true);
 	return mp[fighters[0]];
 }
@@ -707,60 +732,173 @@ void Interface::playTurn(int index, std::vector<std::pair<int, int>>& fighters)
 	fighters.push_back((*players)[index].playCard(this->window, this->cardPos, fighters));
 }
 
-void Interface::wrapUp()
+void Interface::wrapUp(sf::Time duration)
 {
 	/**
 	* @return void
 	* 
-	* -show victory message if human wins
 	* -open leaderboard file
 	* -copy all info to vector
 	* -add new player info
 	* -sort the vector
 	* -print the vector into leaderboard file
-	* ending of game
+	* ending of game: display ending message screen
 	*/
 	for (int i = 0; i < (*players).size(); i++) {
 		std::cout << (*players)[i].getName() << " : " << (*players)[i].getScore() << std::endl;
 	}
-}
 
-//unsigned int Interface::humanGetBid()
-//{
-//	/**
-//	* @return unsigned int
-//	* -open new window for input
-//	* -take input
-//	* -return the input
-//	*/
-//	sf::RenderWindow input(sf::VideoMode(100, 100), "Place Bid", sf::Style::None);
-//	input.setFramerateLimit(60);
-//
-//	unsigned int bid = 2;
-//	while (input.isOpen()) {
-//		sf::Event ev;
-//		while (input.pollEvent(ev)) {
-//			switch (ev.type) {
-//			case sf::Event::KeyPressed:
-//				if (ev.key.code == sf::Keyboard::Up) {
-//					if (bid < 6) bid++;
-//				}
-//				else if (ev.key.code == sf::Keyboard::Down) {
-//					if (bid > 2) bid--;
-//				}
-//				else if (ev.key.code == sf::Keyboard::Enter) {
-//					input.close();
-//				}
-//				break;
-//			}
-//		}
-//
-//		input.clear();
-//		nameText.setPosition(50.f, 50.f);
-//		nameText.setString(std::to_string(bid));
-//		input.draw(nameText);
-//		input.display();
-//
-//	}
-//	return bid;
-//}
+	struct lb {
+		std::string name;
+		int score, rank;
+		sf::Time time;
+	};
+
+	std::ifstream ifile;
+	std::ofstream ofile;
+	std::vector<struct lb> info;
+	struct lb line;
+	std::string sl, name, time;
+	int score, rank;
+	sf::Text fileText;
+
+	switch (levelIndex) {
+	case 0:
+		ifile.open("Leaderboards/Easy.txt");
+		break;
+	case 1:
+		ifile.open("Leaderboards/Medium.txt");
+		break;
+	case 2:
+		ifile.open("Leaderboards/Hard.txt");
+		break;
+	}
+
+	if (ifile.is_open())
+	{
+		while (ifile>>sl>>name>>score>>rank>>time)
+		{
+			line.name = name;
+			line.score = score;
+			line.rank = rank;
+			std::istringstream ss(time);
+			float min, sec;
+			char c;
+			ss >> min >> sec;
+			line.time = sf::seconds(min * 60 + sec);
+			info.push_back(line);
+		}
+	}
+	ifile.close();
+
+	//Rank players
+	std::vector<std::pair<int, std::string>> ranks;
+	for (auto p : (*players)) {
+		ranks.push_back(std::make_pair(p.getScore(), p.getName()));
+	}
+	std::sort(ranks.begin(), ranks.end());
+
+	for (auto p : (*players)) {
+		if (!p.isBot) {
+			name = p.getName();
+			score = p.getScore();
+			for (int i = 0; i < ranks.size();i++) {
+				if (ranks[i].second == name) rank = 4 - i;
+			}
+			line.name = name;
+			line.score = score;
+			line.rank = rank;
+			line.time = duration;
+			info.push_back(line);
+		}
+	}
+
+	//Resorting the list
+	for (int i = info.size() - 1; i >= 1; i--) {
+		for (int j = 0; j < i; j++) {
+			if (info[i].rank < info[j].rank) std::swap(info[i], info[j]);
+			else if (info[i].rank == info[j].rank) {
+				if(info[i].score > info[j].score) std::swap(info[i], info[j]);
+				else if (info[i].score == info[j].score) {
+					if(info[i].time < info[j].time) std::swap(info[i], info[j]);
+					else if (info[i].time == info[j].time) {
+						if(info[i].name < info[j].name) std::swap(info[i], info[j]);
+					}
+				}
+			}
+		}
+	}
+
+	//Printing in file
+	switch (levelIndex) {
+	case 0:
+		ofile.open("Leaderboards/Easy.txt");
+		break;
+	case 1:
+		ofile.open("Leaderboards/Medium.txt");
+		break;
+	case 2:
+		ofile.open("Leaderboards/Hard.txt");
+		break;
+	}
+
+	if (ofile.is_open())
+	{
+		for (int i = 0; i < info.size(); i++)
+		{
+			int s = info[i].time.asSeconds();
+			int m = s / 60;
+			s -= (m * 60);
+			std::stringstream ss;
+			ss << std::setw(2) << std::setfill('0') << m << ':' << std::setw(2) << std::setfill('0') << s;
+			ofile << std::left << std::setw(10) << i + 1 << std::left << std::setw(10) << info[i].name << std::left << std::setw(10)
+				<< info[i].score << std::left << std::setw(10) << info[i].rank << ss.str() << std::endl;
+		}
+	}
+	ofile.close();
+	
+	// Concluding screen
+	bool isOpen = true;
+	float width = 1280.f, height = 720.f;
+	sf::Texture newBg;
+	sf::RectangleShape newBackground(sf::Vector2f(width, height));
+	if (!newBg.loadFromFile("Resources/bg_raw.jpg")) {
+		std::cout << "Error loading bgTexture";
+	}
+	newBackground.setTexture(&newBg);
+	sf::RectangleShape crystal(sf::Vector2f(height * 0.4, height * 0.4));
+	crystal.setOrigin(height * 0.2, height * 0.2);
+	crystal.setTexture(&crystalTexture);
+	barTextBold.setCharacterSize(40);
+	barTextBold.setFillColor(sf::Color(47, 79, 79));
+
+	while (isOpen) {
+		while (window->pollEvent(evnt)) {
+			if (evnt.type == sf::Event::KeyPressed || evnt.type == sf::Event::MouseButtonPressed) {
+				isOpen = false;
+			}
+		}
+
+		this->window->clear();
+
+		this->window->draw(newBackground);
+		crystal.setPosition(width * 0.5, height * 0.5);
+		this->window->draw(crystal);
+
+		barTextBold.setString(ranks[3].second + " has won the Crystal");
+		sf::FloatRect textRect = barTextBold.getLocalBounds();
+		barTextBold.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+		barTextBold.setPosition(width * 0.5, height * 0.2);
+		this->window->draw(barTextBold);
+
+		if (rank == 1) barTextBold.setString("Congratulations! You can now go home!");
+		else barTextBold.setString("Better luck next time");
+
+		textRect = barTextBold.getLocalBounds();
+		barTextBold.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+		barTextBold.setPosition(width * 0.5, height * 0.27);
+		this->window->draw(barTextBold);
+
+		window->display();
+	}
+}

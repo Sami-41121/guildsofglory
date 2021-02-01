@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -27,24 +28,22 @@ private:
 	//variables
 	bool lbOpen;
 	std::vector<sf::Vector2f> buttonPos;
-	std::vector<sf::Texture> buttonTexture;
+	sf::Texture buttonTexture, background, paper;
 	sf::Event evnt;
-	sf::Text fileText;
-	sf::Font font;
-	sf::Texture background;
-
+	sf::Text fileText, buttonText;
+	sf::Font font1, font2, font3;
 	sf::Vector2i mousePosition;
 
 
 	//private functions
 	void initVariables();
-	void initFont(sf::Font font);
+	void initFont(sf::Font font1, sf::Font font2, sf::Font font3);
 	void initText();
 	void initWindow(sf::RenderWindow *window);
 	void initTexture();
 
 public:
-	Leaderboard(sf::RenderWindow *window, sf::Font font);
+	Leaderboard(sf::RenderWindow *window, sf::Font font1, sf::Font font2, sf::Font font3);
 	virtual ~Leaderboard();
 
 	// Accessors

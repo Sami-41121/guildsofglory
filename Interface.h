@@ -1,8 +1,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <sstream>
 #include "Player.h"
 
 
@@ -19,10 +22,10 @@ private:
 	float textMarginLeft = 0.012 * width, textMarginTop = 0.02 * height, textLineGap = 30.f, textIndent = 0.005 * width;
 	sf::Event evnt;
 	sf::Text barText, barTextBold, nameText;
-	sf::Font font1, font2, font3;
+	sf::Font font1, font2, font3, menuFont;
 	sf::Vector2i mousePosition;
 	sf::RectangleShape background, leftBar, rightBar, card;
-	sf::Texture bgTexture, barTexture, cardBackTexture;
+	sf::Texture bgTexture, barTexture, cardBackTexture, crystalTexture;
 	std::vector<Player>* players;
 	std::vector<std::string> classes;
 	std::vector<int> bidsInRound;
@@ -60,7 +63,7 @@ public:
 
 	// Accessors
 	const bool isRunning() const;
-	bool isIdle();
+	//bool isIdle();
 
 	// public functions
 	void drawInterface(std::vector<std::pair<int, int>>& fighters);
@@ -68,7 +71,7 @@ public:
 	
 	// game functions
 	void setRoundInfo(int roundNum);
-	void setIdle();
+	//void setIdle();
 	void resetPoints();
 	void distributeCards(std::vector<std::pair<int, int>> cards);
 	void getBids(int firstPlayer);
@@ -76,7 +79,7 @@ public:
 	int compareCards(std::vector<std::pair<int, int>>& fighters);
 	void compareBids();
 	void playTurn(int index, std::vector<std::pair<int, int>>& fighters);
-	void wrapUp();
+	void wrapUp(sf::Time duration);
 	
 
 };

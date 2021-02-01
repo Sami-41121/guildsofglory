@@ -63,7 +63,7 @@ public:
 	int getHumanBid(sf::RenderWindow *window, sf::Text text, std::vector<int>& bidsInRound, std::vector<sf::Texture>& cardTextures);
 	int placeBid(sf::RenderWindow *window, std::vector<int>& bidsInRound, sf::Text text, int roundfBuff, std::vector<sf::Texture>& cardTextures);
 	std::vector<std::pair<int, int>> ::iterator botPlayCard(std::vector<std::pair<int, int>>& fighters);
-	std::vector<std::pair<int, int>> ::iterator humanPlayCard(sf::RenderWindow* window, std::vector<sf::Vector2f>& cardPos);
+	std::vector<std::pair<int, int>> ::iterator humanPlayCard(sf::RenderWindow* window, std::vector<sf::Vector2f>& cardPos, std::vector<std::pair<int, int>>& fighters);
 	std::pair<int, int> playCard(sf::RenderWindow *window, std::vector<sf::Vector2f>& cardPos, std::vector<std::pair<int, int>>& fighters);
 
 };

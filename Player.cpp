@@ -256,9 +256,15 @@ std::vector<std::pair<int, int>>::iterator Player::botPlayCard(std::vector<std::
 		cardsByClass[p.first].push_back(p.second);
 	}
 	if (fighters.empty()) {
-		suite = 0;
 		for (int i = 0; i < cardsByClass.size(); i++) {
-			if (cardsByClass[i].size() < cardsByClass[suite].size()) suite = i;
+			if (cardsByClass[i].size() > 0) {
+				suite = i;
+			}
+		}
+		for (int i = 0; i < cardsByClass.size(); i++) {
+			if (cardsByClass[i].size() > 0 and cardsByClass[i].size() < cardsByClass[suite].size()) {
+				suite = i;
+			}
 		}
 	}
 	else
@@ -285,7 +291,7 @@ std::vector<std::pair<int, int>>::iterator Player::botPlayCard(std::vector<std::
 		}
 	}
 	else {
-		if (!cardsByClass[buff].empty()) {
+		if (cardsByClass[buff].empty()) {
 			for (int i = 0; i < 4; i++) {
 				int j = cardsByClass[i].size();
 				if (j > 0) {
@@ -310,9 +316,8 @@ std::vector<std::pair<int, int>>::iterator Player::botPlayCard(std::vector<std::
 
 }
 
-std::vector<std::pair<int, int>>::iterator Player::humanPlayCard(sf::RenderWindow* window, std::vector<sf::Vector2f>& cardPos)
+std::vector<std::pair<int, int>>::iterator Player::humanPlayCard(sf::RenderWindow* window, std::vector<sf::Vector2f>& cardPos, std::vector<std::pair<int, int>>& fighters)
 {
-	//0.064 * width, 0.16 * height
 	sf::Event ev;
 	bool takingInput = true;
 	while (takingInput) {
@@ -326,7 +331,22 @@ std::vector<std::pair<int, int>>::iterator Player::humanPlayCard(sf::RenderWindo
 							clickedCard = i;
 						}
 					}
-					if (clickedCard >= 0) return this->cardsInHand.begin() + clickedCard;
+					if (clickedCard >= 0) {
+						if (fighters.size() == 0) {
+							return this->cardsInHand.begin() + clickedCard;
+						}
+						else {
+							// check for validity
+							bool hasBuff = false, hasSuite = false;
+							for (auto c : cardsInHand) {
+								if (c.first == fighters[0].first) hasSuite = true;
+								if (c.first == this->buff) hasBuff = true;
+							}
+							if (fighters[0].first == cardsInHand[clickedCard].first) return this->cardsInHand.begin() + clickedCard;
+							else if (!hasSuite and hasBuff and cardsInHand[clickedCard].first == this->buff) return this->cardsInHand.begin() + clickedCard;
+							else if (!hasSuite and !hasBuff) return this->cardsInHand.begin() + clickedCard;
+						}
+					}
 				}
 			}
 		}
@@ -357,7 +377,7 @@ std::pair<int, int> Player::playCard(sf::RenderWindow *window, std::vector<sf::V
 		cardsInHand.erase(pairIt);
 	}
 	else {
-		pairIt = humanPlayCard(window, cardPos);
+		pairIt = humanPlayCard(window, cardPos, fighters);
 		playedCard = *pairIt;
 		cardsInHand.erase(pairIt);
 	}

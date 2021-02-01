@@ -9,10 +9,9 @@ void Leaderboard::initVariables()
 	* -set strings of buttons
 	*/
 	this->buttonPos = std::vector<sf::Vector2f>(4);
-	this->buttonTexture = std::vector<sf::Texture>(4);
 }
 
-void Leaderboard::initFont(sf::Font font)
+void Leaderboard::initFont(sf::Font font1, sf::Font font2, sf::Font font3)
 {
 	/**
 	* @return void
@@ -21,7 +20,9 @@ void Leaderboard::initFont(sf::Font font)
 	* -sets font to private variable
 	*/
 
-	this->font = font;
+	this->font1 = font1;
+	this->font2 = font2;
+	this->font3 = font3;
 }
 
 void Leaderboard::initText()
@@ -34,8 +35,7 @@ void Leaderboard::initText()
 	* -set text for title
 	* -sets char size and color
 	*/
-	this->fileText = sf::Text("", this->font, 15);
-	this->fileText.setFillColor(sf::Color::White);
+	this->fileText = sf::Text("", this->font1, 15);
 }
 
 void Leaderboard::initWindow(sf::RenderWindow *window)
@@ -55,27 +55,24 @@ void Leaderboard::initTexture()
 {
 	/**
 	* @return void
-	* load textures from file
+	*
+	* load texture from file
+	* show error message if failed
+	* setTexture to buttonTexture
 	*/
-	if (!this->background.loadFromFile("Resources/leaderboard_bg.jpg")) {
+	if (!this->background.loadFromFile("Resources/bg_raw.jpg")) {
 		std::cout << "Error loading bgTexture";
 	}
-	if (!this->buttonTexture[0].loadFromFile("Resources/button_easy.png")) {
+	if (!this->buttonTexture.loadFromFile("Resources/button.png")) {
 		std::cout << "Error loading bgTexture";
 	}
-	if (!this->buttonTexture[1].loadFromFile("Resources/button_medium.png")) {
-		std::cout << "Error loading bgTexture";
-	}
-	if (!this->buttonTexture[2].loadFromFile("Resources/button_hard.png")) {
-		std::cout << "Error loading bgTexture";
-	}
-	if (!this->buttonTexture[3].loadFromFile("Resources/button_back-to-main-menu.png")) {
+	if (!this->paper.loadFromFile("Resources/parchment.png")) {
 		std::cout << "Error loading bgTexture";
 	}
 
 }
 
-Leaderboard::Leaderboard(sf::RenderWindow *window, sf::Font font)
+Leaderboard::Leaderboard(sf::RenderWindow *window, sf::Font font1, sf::Font font2, sf::Font font3)
 {
 	/**
 	* This function is the container of the main loop
@@ -85,7 +82,7 @@ Leaderboard::Leaderboard(sf::RenderWindow *window, sf::Font font)
 
 	this->initVariables();
 	this->initWindow(window);
-	this->initFont(font);
+	this->initFont(font1, font2, font3);
 	this->initText();
 	this->initTexture();
 
@@ -207,16 +204,38 @@ void Leaderboard::renderButtons()
 	/**
 	* @return void
 	*
-	* -set texture
+	* -render buttons
 	* -draw the buttons
 	* -
 	*/
 	sf::RectangleShape button(sf::Vector2f(400.f, 60.0f));
 	button.setOrigin(200.f, 0.0f);
+	button.setTexture(&buttonTexture);
+	char buttonString[4][25] = { "Easy", "Medium", "Hard", "Back to Main Menu" };
+
+	buttonText.setFont(font3);
+	buttonText.setString("Leaderboard");
+	buttonText.setCharacterSize(70);
+	buttonText.setFillColor(sf::Color(47, 79, 79));
+
+	sf::FloatRect textRect = buttonText.getLocalBounds();
+	buttonText.setOrigin(textRect.left + textRect.width / 2.0f, 0);
+	buttonText.setPosition(window->getSize().x / 2, window->getSize().y * 0.13);
+
+	this->window->draw(buttonText);
+	buttonText.setFont(font2);
 	for (int i = 0; i < 4; i++) {
 		button.setPosition(buttonPos[i]);
-		button.setTexture(&buttonTexture[i]);
+		buttonText.setString(buttonString[i]);
+		buttonText.setCharacterSize(30);
+
+		sf::FloatRect textRect = buttonText.getLocalBounds();
+		buttonText.setOrigin(textRect.left + textRect.width / 2.0f, 0);
+
+		buttonText.setPosition(buttonPos[i].x, buttonPos[i].y + 10.f);
+		buttonText.setFillColor(sf::Color(250, 250, 210));
 		this->window->draw(button);
+		this->window->draw(buttonText);
 	}
 }
 
@@ -236,7 +255,7 @@ void Leaderboard::render()
 	* -Render Objects
 	* -Display frame in window
 	*/
-	this->window->clear(sf::Color(0, 0, 0, 255));
+	this->window->clear();
 
 	this->renderBackground();
 	this->renderButtons();
@@ -254,6 +273,11 @@ void Leaderboard::openEasyLeaderboard()
 	std::string line;
 	std::ifstream file;
 	std::vector<sf::Text> textList;
+	std::stringstream ss;
+	ss << std::left << std::setw(10) << "Sl no." << std::left << std::setw(10) << "Player"
+		<< std::left << std::setw(10) << "Score" << std::left << std::setw(10) << "Rank" << std::left << std::setw(10) << "Time";
+	fileText.setString(ss.str());
+	textList.push_back(fileText);
 
 	file.open("Leaderboards/Easy.txt");
 	if (file.is_open())
@@ -280,7 +304,14 @@ void Leaderboard::openMediumLeaderboard()
 	std::ifstream file;
 	std::vector<sf::Text> textList;
 
+	std::stringstream ss;
+	ss << std::left << std::setw(10) << "Sl no." << std::left << std::setw(10) << "Player" 
+		<< std::left << std::setw(10) << "Score" << std::left << std::setw(10) << "Rank" << std::left << std::setw(10) << "Time";
+	fileText.setString(ss.str());
+	textList.push_back(fileText);
+
 	file.open("Leaderboards/Medium.txt");
+
 	if (file.is_open())
 	{
 		while (std::getline(file, line))
@@ -304,6 +335,11 @@ void Leaderboard::openHardLeaderboard()
 	std::string line;
 	std::ifstream file;
 	std::vector<sf::Text> textList;
+	std::stringstream ss;
+	ss << std::left << std::setw(10) << "Sl no." << std::left << std::setw(10) << "Player"
+		<< std::left << std::setw(10) << "Score" << std::left << std::setw(10) << "Rank" << std::left << std::setw(10) << "Time";
+	fileText.setString(ss.str());
+	textList.push_back(fileText);
 
 	file.open("Leaderboards/Hard.txt");
 	if (file.is_open())
@@ -328,13 +364,14 @@ void Leaderboard::renderLeaderboard(std::vector<sf::Text> textList)
 	* -poll event for new window
 	* -print text from vector
 	*/
-	sf::RectangleShape lb(sf::Vector2f(500.f, 600.f));
-	lb.setOrigin(250.f, 300.f);
+	sf::RectangleShape lb(sf::Vector2f(800.f, 704.f));
+	lb.setOrigin(400.f, 352.f);
 	lb.setPosition(this->window->getSize().x * 0.5, this->window->getSize().y * 0.5);
+	lb.setTexture(&paper);
 	bool lbOpen = true;
 	
 
-	int st = 0, ed = std::min(40, (int)textList.size());     // starting and ending index for line printing
+	int st = 0, ed = std::min(25, (int)textList.size());     // starting and ending index for line printing
 
 	while (lbOpen) {
 		while (this->window->pollEvent(this->evnt)) {
@@ -374,10 +411,11 @@ void Leaderboard::renderLeaderboard(std::vector<sf::Text> textList)
 			}
 		}
 
-		this->window->clear();
-
+		this->window->clear(sf::Color(47, 79, 79, 150));
+		this->window->draw(lb);
 		for (int i = st; i < ed; i++) {
-			textList[i].setPosition(this->window->getSize().x * 0.5 - 250, this->window->getSize().y * 0.5 - 300 + (i - st) * 15.0);
+			textList[i].setPosition(this->window->getSize().x * 0.5 - 200, this->window->getSize().y * 0.5 - 200 + (i - st) * 15.0);
+			textList[i].setFillColor(sf::Color(47, 79, 79));
 			this->window->draw(textList[i]);
 		}
 		this->window->display();
