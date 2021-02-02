@@ -53,6 +53,7 @@ public:
 	void setBid(int newBid);
 	void setPoint(int newPoint);
 	void clearHand();
+	void clearSeen();
 
 
 	// Card arragement

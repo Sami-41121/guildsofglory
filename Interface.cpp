@@ -598,6 +598,7 @@ void Interface::resetPoints()
 	*/
 	for (int i = 0; i < (*players).size(); i++) {
 		(*players)[i].setPoint(0);
+		(*players)[i].clearSeen();
 	}
 }
 

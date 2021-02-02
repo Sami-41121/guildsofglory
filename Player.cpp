@@ -111,6 +111,12 @@ void Player::clearHand()
 	this->cardsInHand.clear();
 }
 
+void Player::clearSeen()
+{
+	/* Clears the cards seen list */
+	this->cardsSeen.clear();
+}
+
 void Player::getCard(std::pair<int, int> newCard)
 {
 	/**
